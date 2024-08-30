@@ -6,13 +6,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract TriumphNFT is ERC721, Ownable {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIdCounter;
-
     string public movieTitle;
+    uint256 public price;
 
-    constructor(string memory _movieTitle, string memory _name, string memory _symbol) ERC721(_name, _symbol) {
+    constructor(uint256 _price, string memory _name, string memory _symbol) ERC721(_name, _symbol) {
         movieTitle = _movieTitle;
+        price = _price;
     }
 
     function mintNFT(address to, string memory metadataURI) public onlyOwner returns (uint256) {

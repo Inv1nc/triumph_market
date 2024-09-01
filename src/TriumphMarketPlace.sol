@@ -28,6 +28,12 @@ contract MovieFactory {
     uint256 public immutable movieSharePrice = 63;
     uint256 public immutable marketplaceFee = 7;
 
+    address public owner;
+
+    constructor() {
+        owner = msg.sender;
+    }
+
     event MovieCreated(string title, address nftContract);
 
     // Function to create a new movie and deploy an associated NFT contract
@@ -73,13 +79,14 @@ contract MovieFactory {
         require(!theaters[theaterId].seatsBooked[seatNumber], "Seat already booked");
 
         MovieNFT movieNFT = MovieNFT(movies[movieId].nftContract);
+        uint256 ticketPrice = movieNFT.price();
 
         // Ensure that the correct amount is sent with the transaction
-        require(msg.value == movieNFT.price, "Incorrect ticket price");
+        require(msg.value == ticketPrice, "Incorrect ticket price");
 
         // Calculate shares
-        uint256 theatreShareAmount = (ticketPrice * theatreShare) / 100;
-        uint256 movieShareAmount = (ticketPrice * movieShare) / 100;
+        uint256 theatreShareAmount = (ticketPrice * theatreSharePrice) / 100;
+        uint256 movieShareAmount = (ticketPrice * movieSharePrice) / 100;
         uint256 marketplaceFeeAmount = (ticketPrice * marketplaceFee) / 100;
 
         // Calculate amounts for distribution
@@ -109,7 +116,7 @@ contract MovieFactory {
     function getTheaterDetails(uint256 theaterId) public view returns (string memory, string memory, address) {
         return (theaters[theaterId].name, theaters[theaterId].location, theaters[theaterId].owner);
     }
-    
+
     // Function to get Available seats
     function getAvailableSeats(uint256 theaterId) public view returns (uint256[] memory) {
         uint256[] memory availableSeats = new uint256[](theaters[theaterId].noOfSeats);
